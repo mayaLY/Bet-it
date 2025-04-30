@@ -8,6 +8,5 @@ export const OptionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Bet', 
       },
-
 })
 export const Option = mongoose.model('Option',OptionSchema);
