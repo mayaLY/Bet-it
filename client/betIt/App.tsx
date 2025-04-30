@@ -1,4 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';i
+mport { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
