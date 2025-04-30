@@ -1,4 +1,5 @@
 import express from 'express';
+import { createUserBet } from './controller/setUserBet';
 const app = express()
 const port = 3000
 
@@ -12,6 +13,7 @@ console.log("someone called me")
   res.send('<h1>Hello From Express</h1><p>Express is a web application framework for Node.js</p>')
 })
 
+app.post('/user-bet', createUserBet);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
