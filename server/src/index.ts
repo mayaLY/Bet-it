@@ -1,7 +1,17 @@
 import express from 'express';
 import { createUserBet } from './controller/setUserBet';
+import mongoose from 'mongoose';
+
 const app = express()
 const port = 3000
+
+const dbUrl = process.env.DB_URL
+const database = process.env.DB_NAME
+
+mongoose.connect(`${dbUrl}/${database}`).then(()=>{
+  console.log('connected to db')
+
+})
 
 console.log("Hello World")
 
