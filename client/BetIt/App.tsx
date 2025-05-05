@@ -1,4 +1,3 @@
-// App.tsx
 import React from 'react';
 import AppNavigator from './router/AppNavigator';
 import { ThemeProvider } from './context/Theme/ThemeContext';

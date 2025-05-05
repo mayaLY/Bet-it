@@ -1,4 +1,3 @@
-// AuthPage.tsx
 import React from 'react';
 import {View,Button,Switch,Text,StyleSheet,ActivityIndicator,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
