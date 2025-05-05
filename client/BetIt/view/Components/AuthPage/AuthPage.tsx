@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import {View,Button,Switch,ActivityIndicator,StyleSheet,Text,useColorScheme} from 'react-native';
+// AuthPage.tsx
+import React from 'react';
+import {View,Button,Switch,Text,StyleSheet,ActivityIndicator,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../router/AppNavigator';
+import { useTheme } from '../../../context/Theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
 
 export default function AuthPage({ navigation }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false); // manually toggled theme
+  const [loading, setLoading] = React.useState(false);
+  const { theme, toggleTheme } = useTheme();
+
+  const isDark = theme === 'dark';
 
   const handleRegister = () => {
     setLoading(true);
@@ -25,19 +29,17 @@ export default function AuthPage({ navigation }: Props) {
     }, 1000);
   };
 
-  const toggleTheme = () => setDarkMode(prev => !prev);
-
-  const themeStyles = darkMode ? darkStyles : lightStyles;
+  const themeStyles = isDark ? darkStyles : lightStyles;
 
   return (
     <View style={[styles.container, themeStyles.container]}>
       <View style={styles.switchContainer}>
-        <Text style={themeStyles.text}>{darkMode ? 'Dark' : 'Light'} Mode</Text>
-        <Switch value={darkMode} onValueChange={toggleTheme} />
+        <Text style={themeStyles.text}>{isDark ? 'Dark' : 'Light'} Mode</Text>
+        <Switch value={isDark} onValueChange={toggleTheme} />
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color={darkMode ? "#fff" : "#000"} />
+        <ActivityIndicator size="large" color={isDark ? "#fff" : "#000"} />
       ) : (
         <>
           <View style={styles.button}>
@@ -57,7 +59,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   switchContainer: {
     position: 'absolute',
