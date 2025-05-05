@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, Button, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {View,Button,Switch,ActivityIndicator,StyleSheet,Text,useColorScheme} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../router/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
 
 export default function AuthPage({ navigation }: Props) {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false); // manually toggled theme
 
   const handleRegister = () => {
     setLoading(true);
@@ -24,10 +25,19 @@ export default function AuthPage({ navigation }: Props) {
     }, 1000);
   };
 
+  const toggleTheme = () => setDarkMode(prev => !prev);
+
+  const themeStyles = darkMode ? darkStyles : lightStyles;
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, themeStyles.container]}>
+      <View style={styles.switchContainer}>
+        <Text style={themeStyles.text}>{darkMode ? 'Dark' : 'Light'} Mode</Text>
+        <Switch value={darkMode} onValueChange={toggleTheme} />
+      </View>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={darkMode ? "#fff" : "#000"} />
       ) : (
         <>
           <View style={styles.button}>
@@ -48,10 +58,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f4f4f4',
+  },
+  switchContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   button: {
     marginVertical: 10,
     width: 200,
+  },
+});
+
+const lightStyles = StyleSheet.create({
+  container: {
+    backgroundColor: '#f4f4f4',
+  },
+  text: {
+    color: '#000',
+    marginRight: 10,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    backgroundColor: '#121212',
+  },
+  text: {
+    color: '#fff',
+    marginRight: 10,
   },
 });
