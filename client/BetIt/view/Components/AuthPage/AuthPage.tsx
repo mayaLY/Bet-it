@@ -1,5 +1,12 @@
 import React from 'react';
-import {View,Button,Switch,Text,StyleSheet,ActivityIndicator,} from 'react-native';
+import {
+  View,
+  Text,
+  Switch,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../router/AppNavigator';
 import { useTheme } from '../../../context/Theme/ThemeContext';
@@ -41,12 +48,13 @@ export default function AuthPage({ navigation }: Props) {
         <ActivityIndicator size="large" color={isDark ? "#fff" : "#000"} />
       ) : (
         <>
-          <View style={styles.button}>
-            <Button title="Go to Register" onPress={handleRegister} />
-          </View>
-          <View style={styles.button}>
-            <Button title="Go to Login" onPress={handleLogin} />
-          </View>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Go to Register</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Go to Login</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -69,8 +77,16 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 10,
     width: 200,
-    backgroundColor:'#26bbff',
+    backgroundColor: '#26bbff',
     borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
 
