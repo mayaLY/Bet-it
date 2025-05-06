@@ -69,6 +69,8 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 10,
     width: 200,
+    backgroundColor:'#26bbff',
+    borderRadius: 30,
   },
 });
 
@@ -84,7 +86,7 @@ const lightStyles = StyleSheet.create({
 
 const darkStyles = StyleSheet.create({
   container: {
-    backgroundColor: '#121212',
+    backgroundColor: '#273a73',
   },
   text: {
     color: '#fff',
