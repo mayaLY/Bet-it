@@ -48,11 +48,11 @@ export default function AuthPage({ navigation }: Props) {
         <ActivityIndicator size="large" color={isDark ? "#fff" : "#000"} />
       ) : (
         <>
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <TouchableOpacity style={[styles.button, themeStyles.button]} onPress={handleRegister}>
             <Text style={styles.buttonText}>Go to Register</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <TouchableOpacity style={[styles.button, themeStyles.button]} onPress={handleLogin}>
             <Text style={styles.buttonText}>Go to Login</Text>
           </TouchableOpacity>
         </>
@@ -77,11 +77,12 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 10,
     width: 200,
-    backgroundColor: '#26bbff',
+    backgroundColor: '#273a73',
     borderRadius: 30,
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: 'center',
+    
   },
   buttonText: {
     color: 'white',
@@ -98,6 +99,9 @@ const lightStyles = StyleSheet.create({
     color: '#000',
     marginRight: 10,
   },
+  button: {
+    backgroundColor: '#273a73',
+  },
 });
 
 const darkStyles = StyleSheet.create({
@@ -107,5 +111,8 @@ const darkStyles = StyleSheet.create({
   text: {
     color: '#fff',
     marginRight: 10,
+  },
+  button: {
+    backgroundColor: '#4dd0e1',
   },
 });

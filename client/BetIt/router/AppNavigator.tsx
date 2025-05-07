@@ -1,6 +1,7 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from '../context/Theme/ThemeContext';
 import AuthPage from '../view/Components/AuthPage/AuthPage';
 import RegisterPage from '../view/Components/RegisterPage/RegisterPage';
 import LoginPage from '../view/Components/LoginPage/LoginPage';
@@ -13,20 +14,24 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Auth" screenOptions={{
+    <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+      <Stack.Navigator
+        screenOptions={{
           headerStyle: {
-            backgroundColor: '#1e90ff', 
+            backgroundColor: isDark ? '#4dd0e1' : '#273a73',
           },
-          headerTintColor: '#fff', 
+          headerTintColor: isDark ? '#000' : '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
             fontSize: 20,
           },
-          headerShadowVisible: false, 
-        }}>
-        <Stack.Screen name="Auth" component={AuthPage} />
+        }}
+      >
+        <Stack.Screen name="Auth" component={AuthPage} options={{ title: 'Auth' }} />
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="Login" component={LoginPage} />
       </Stack.Navigator>
