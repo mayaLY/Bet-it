@@ -1,17 +1,20 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import { createUserBet } from './controller/setUserBet';
 import mongoose from 'mongoose';
 
 const app = express()
 const port = 3000
 
+dotenv.config();
+console.log('DB_URL:', process.env.DB_URL);
+
 const dbUrl = process.env.DB_URL
 const database = process.env.DB_NAME
 
-mongoose.connect(`${dbUrl}/${database}`).then(()=>{
-  console.log('connected to db')
-
-})
+mongoose.connect(`${dbUrl}/${database}`)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 console.log("Hello World")
 
