@@ -10,7 +10,7 @@ export default function RegisterPage({ navigation }: Props) {
   const isDark = theme === 'dark';
 
   const [email, setEmail] = useState('');
-const [username, setUsername] = useState('');
+const [name, setUsername] = useState('');
 const [password, setPassword] = useState('');
 const [confirmPassword, setConfirmPassword] = useState('');
 const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const [error, setError] = useState<string | null>(null);
 
 
   const handleRegister = async () => {
-    if (!email || !username || !password || password !== confirmPassword) {
+    if (!email || !name || !password || password !== confirmPassword) {
       setError("Please fill all fields and make sure passwords match.");
       return;
     }
@@ -27,14 +27,14 @@ const [error, setError] = useState<string | null>(null);
     setError(null);
   
     try {
-      const response = await fetch("http://YOUR_SERVER_URL/api/register", {
+      const response = await fetch("http://YOUR_SERVER_URL/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email,
-          username,
+          name,
           password,
         }),
       });
@@ -83,7 +83,7 @@ const [error, setError] = useState<string | null>(null);
         style={[styles.input, themeStyles.input]}
         placeholder="Username"
         placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={username}
+        value={name}
         onChangeText={setUsername}
       />
 
