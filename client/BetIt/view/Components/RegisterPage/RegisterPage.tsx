@@ -4,7 +4,8 @@ import { useTheme } from '../../../context/Theme/ThemeContext';
 import { RootStackParamList } from '../../../router/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function RegisterPage() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
+export default function RegisterPage({ navigation }: Props) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
