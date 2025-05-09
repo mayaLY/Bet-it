@@ -1,40 +1,64 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,StyleSheet,Alert,} from 'react-native';
 import { useTheme } from '../../../context/Theme/ThemeContext';
+import { RootStackParamList } from '../../../router/AppNavigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export default function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const [username, setUsername] = useState('');
+const [password, setPassword] = useState('');
+const [confirmPassword, setConfirmPassword] = useState('');
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
 
-  const handleRegister = () => {
-    if (!email || !username || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill all fields');
+
+  const handleRegister = async () => {
+    if (!email || !username || !password || password !== confirmPassword) {
+      setError("Please fill all fields and make sure passwords match.");
       return;
     }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
+  
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const response = await fetch("http://YOUR_SERVER_URL/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          username,
+          password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+       
+        throw new Error(data.message || "Registration failed");
+      }
+  
+      
+      console.log("User registered:", data);
+      
+      navigation.navigate("Login");
+  
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    
-    ///////
-    Alert.alert('Success', `Account created for ${username}`);
   };
 
   const handleGoogleSignUp = () => {
-    // Implement Google Sign-up logic here (e.g., with Expo AuthSession)
+    
     Alert.alert('Info', 'Google Sign-Up not implemented yet');
   };
 
