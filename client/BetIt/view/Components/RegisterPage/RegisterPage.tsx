@@ -27,7 +27,7 @@ const [error, setError] = useState<string | null>(null);
     setError(null);
   
     try {
-      const response = await fetch("http://YOUR_SERVER_URL/users/register", {
+      const response = await fetch("http://localhost:3000/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
