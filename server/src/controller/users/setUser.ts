@@ -24,7 +24,7 @@ export async function login(req: Request, res: Response) {
     }
 }
 
-export async function register(req: Request, res: Response) {
+export async function register(req: any, res: any) {
     try {
         const { email, password, name } = req.body;
 
