@@ -25,14 +25,13 @@ const [error, setError] = useState<string | null>(null);
     setError(null);
   
     try {
-      const response = await fetch("http://localhost:3000/users/register", {
+      const response = await fetch("http://localhost:3000/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email,
-          name,
           password,
         }),
       });
@@ -41,13 +40,13 @@ const [error, setError] = useState<string | null>(null);
   
       if (!response.ok) {
        
-        throw new Error(data.message || "Registration failed");
+        throw new Error(data.message || "Login failed");
       }
   
       
-      console.log("User registered:", data);
+      console.log("User Logged In:", data);
       
-      navigation.navigate("Login");
+    //  navigation.navigate("Homepage");
   
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -88,7 +87,7 @@ const [error, setError] = useState<string | null>(null);
 
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Login``</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
