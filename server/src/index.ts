@@ -3,10 +3,14 @@ import dotenv from 'dotenv';
 import { createUserBet } from './controller/setUserBet';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users/userRoutes';
+import  cors from 'cors';
+
 
 const app = express()
 const port = 3000
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 dotenv.config();
 console.log('DB_URL:', process.env.DB_URL);
