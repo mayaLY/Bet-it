@@ -5,10 +5,12 @@ import { useTheme } from '../context/Theme/ThemeContext';
 import AuthPage from '../view/Components/AuthPage/AuthPage';
 import RegisterPage from '../view/Components/RegisterPage/RegisterPage';
 import LoginPage from '../view/Components/LoginPage/LoginPage';
+import HomePage from '../view/Components/HomePage/HomePage';
 export type RootStackParamList = {
   Auth: undefined;
   Register: undefined;
   Login: undefined;
+  HomePage: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -34,6 +36,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Auth" component={AuthPage} options={{ title: 'Auth' }} />
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="Login" component={LoginPage} />
+        <Stack.Screen name="HomePage" component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
