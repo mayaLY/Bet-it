@@ -1,27 +1,48 @@
 import { Request, Response } from 'express';
 import { User } from '../../models/user/userModel';
+import jwt from 'jwt-simple';
+import bcrypt from 'bcrypt';
 
 export async function login(req: Request, res: Response) {
-    try {
-        const { email, password } = req.body;
+  try {
+    const secret = process.env.JWT_SECRET as string;
+    const { email, password } = req.body;
 
-        console.log(email, password)
+    console.log(email, password);
 
-        const user = await User.findOne({ email, password });
-
-        if (user) {
-            console.log("user", user)
-            res.cookie('userId', user._id, { maxAge: 1000 * 60 * 60 * 24 * 1 });
-            res.status(200).send({ ok:true });
-        } else {
-            res.status(401).send({ error: 'Invalid email or password' });
-        }
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).send(error);
-
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).send({ error: 'Invalid email or password' });
     }
+
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).send({ error: 'Invalid email or password' });
+    }
+
+    // JWT payload
+    const payload = {
+      userId: user._id,
+      email: user.email,
+      fullName: user.name,
+    };
+
+    // Generate JWT token
+    const token = jwt.sign(payload, secret, { expiresIn: '1d' });
+
+    // Set token in cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // set to true in production with HTTPS
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    });
+
+    return res.status(200).send({ ok: true, user: payload });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: 'Internal Server Error' });
+  }
 }
 
 export async function register(req: any, res: any) {
