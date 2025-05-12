@@ -57,7 +57,7 @@ const [error, setError] = useState<string | null>(null);
 
   const handleGoogleLogin = () => {
     
-    Alert.alert('Info', 'Google Sign-Up not implemented yet');
+    Alert.alert('Info', 'Google Sign-Up not implemented yet!');
   };
 
   const themeStyles = isDark ? darkStyles : lightStyles;
