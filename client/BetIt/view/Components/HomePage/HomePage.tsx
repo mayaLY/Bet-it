@@ -59,6 +59,10 @@ const [error, setError] = useState<string | null>(null);
     
     Alert.alert('Info', 'Google Sign-Up not implemented yet');
   };
+  const handleStatistics = () => {
+    
+    Alert.alert('Info', 'Google Sign-Up not implemented yet');
+  };
 
   const themeStyles = isDark ? darkStyles : lightStyles;
 
@@ -70,17 +74,19 @@ const [error, setError] = useState<string | null>(null);
     
 
       <TouchableOpacity style={styles.button} onPress={handleNewBet}>
-        <Text style={styles.buttonText}>New Bet``</Text>
+        <Text style={styles.buttonText}>New Bet</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#de5246' }]}
-        onPress={handleViewBets}
-      >
+        style={styles.button} onPress={handleViewBets}>
         <Text style={styles.buttonText}>View Bets</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={handleStatistics}>
+        <Text style={styles.buttonText}>Statisctics</Text>
+      </TouchableOpacity>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({

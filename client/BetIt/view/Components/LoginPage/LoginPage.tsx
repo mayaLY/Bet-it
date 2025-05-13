@@ -46,7 +46,7 @@ const [error, setError] = useState<string | null>(null);
       
       console.log("User Logged In:", data);
       
-    //  navigation.navigate("Homepage");
+      navigation.navigate("HomePage");
   
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -87,7 +87,7 @@ const [error, setError] = useState<string | null>(null);
 
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login``</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
