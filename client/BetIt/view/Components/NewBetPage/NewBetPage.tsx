@@ -1,158 +1,147 @@
 import React, { useState } from 'react';
-import {View,Text,TextInput,TouchableOpacity,StyleSheet,Alert,} from 'react-native';
-import { useTheme } from '../../../context/Theme/ThemeContext';
-import { RootStackParamList } from '../../../router/AppNavigator';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'NewBet'>;
-export default function NewBetPage({ navigation }: Props) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+export default function SurveyBuilderPage() {
+  const navigation = useNavigation();
 
-  const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
+  const [expirationDate, setExpirationDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [options, setOptions] = useState(['', '']); 
 
+  const handleAddOption = () => {
+    setOptions([...options, '']);
+  };
 
-  const handleLogin = async () => {
-    if (!email || !password ) {
-      setError("Please fill all fields and make sure passwords match.");
+  const handleOptionChange = (text: string, index: number) => {
+    const updated = [...options];
+    updated[index] = text;
+    setOptions(updated);
+  };
+
+  const handleCreateSurvey = () => {
+    const validOptions = options.filter(opt => opt.trim() !== '');
+    if (!description.trim() || validOptions.length < 2) {
+      Alert.alert('Error', 'Please fill out the description and at least 2 valid options.');
       return;
     }
-  
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const response = await fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-       
-        throw new Error(data.message || "Login failed");
-      }
-  
-      
-      console.log("User Logged In:", data);
-      
-      navigation.navigate("HomePage");
-  
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleGoogleLogin = () => {
+    const survey = {
+      description,
+      expirationDate,
+      options: validOptions,
+    };
+
     
-    Alert.alert('Info', 'Google Sign-Up not implemented yet!');
+   // navigation.navigate('SurveyDisplay', { survey });
   };
-
-  const themeStyles = isDark ? darkStyles : lightStyles;
 
   return (
-    <View style={[styles.container, themeStyles.container]}>
-      <Text style={[styles.title, themeStyles.text]}>Login</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Create a Survey</Text>
 
       <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Email"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
+        style={styles.input}
+        placeholder="Survey Description"
+        value={description}
+        onChangeText={setDescription}
+        multiline
       />
 
-      <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Password"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
+        <Text style={styles.dateButtonText}>Select Expiration Date</Text>
+        <Text>{expirationDate.toDateString()}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#de5246' }]}
-        onPress={handleGoogleLogin}
-      >
-        <Text style={styles.buttonText}>Log-in with Google</Text>
+      {showDatePicker && (
+        <DateTimePicker
+          value={expirationDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setExpirationDate(selectedDate);
+            }
+          }}
+        />
+      )}
+
+      <Text style={styles.subtitle}>Options:</Text>
+      {options.map((option, index) => (
+        <TextInput
+          key={index}
+          style={styles.input}
+          placeholder={`Option ${index + 1}`}
+          value={option}
+          onChangeText={text => handleOptionChange(text, index)}
+        />
+      ))}
+
+      <TouchableOpacity onPress={handleAddOption} style={styles.addButton}>
+        <Text style={styles.addButtonText}>+ Add Option</Text>
       </TouchableOpacity>
-    </View>
+
+      <TouchableOpacity onPress={handleCreateSurvey} style={styles.submitButton}>
+        <Text style={styles.submitButtonText}>Create Survey</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
+    padding: 20,
+    paddingBottom: 50,
   },
   title: {
-    fontSize: 28,
-    marginBottom: 24,
-    textAlign: 'center',
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  subtitle: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    borderColor: '#aaa',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
   },
-  button: {
-    backgroundColor: '#26bbff',
-    padding: 12,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 10,
+  dateButton: {
+    backgroundColor: '#eee',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  buttonText: {
-    color: '#fff',
+  dateButtonText: {
     fontWeight: 'bold',
   },
-});
-
-const lightStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
+  addButton: {
+    backgroundColor: '#26bbff',
+    padding: 10,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  text: {
-    color: '#000',
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
-  input: {
-    borderColor: '#ccc',
-    color: '#000',
+  submitButton: {
+    backgroundColor: '#4caf50',
+    padding: 15,
+    borderRadius: 25,
+    alignItems: 'center',
   },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1c1c1c',
-  },
-  text: {
-    color: '#fff',
-  },
-  input: {
-    borderColor: '#555',
-    color: '#fff',
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
