@@ -12,6 +12,7 @@ export async function login(req: any, res: any) {
     console.log(email, password);
 
     const user = await User.findOne({ email });
+    console.log(user);
     if (!user) {
       return res.status(401).send({ error: 'Invalid email or password' });
     }
