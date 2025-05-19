@@ -85,7 +85,7 @@ export default function SurveyBuilderPage() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleCreateSurvey} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>Create Survey</Text>
+        <Text style={styles.submitButtonText}>Create Bet</Text>
       </TouchableOpacity>
     </ScrollView>
   );

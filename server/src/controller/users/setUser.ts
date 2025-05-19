@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { User } from '../../models/user/userModel';
-import jwt from 'jwt-simple';
+//import jwt from 'jwt-simple';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-export async function login(req: Request, res: Response) {
+export async function login(req: any, res: any) {
   try {
     const secret = process.env.JWT_SECRET as string;
     const { email, password } = req.body;
@@ -24,7 +25,7 @@ export async function login(req: Request, res: Response) {
     const payload = {
       userId: user._id,
       email: user.email,
-      fullName: user.name,
+      fullName: user.fullname,
     };
 
     // Generate JWT token
@@ -47,7 +48,9 @@ export async function login(req: Request, res: Response) {
 
 export async function register(req: any, res: any) {
     try {
+      
         const { email, password, name } = req.body;
+        console.log(email,password,name);
 
         //save username and password to database
         const user = new User({ email, password, name });
