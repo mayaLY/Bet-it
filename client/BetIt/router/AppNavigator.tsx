@@ -6,12 +6,15 @@ import AuthPage from '../view/Components/AuthPage/AuthPage';
 import RegisterPage from '../view/Components/RegisterPage/RegisterPage';
 import LoginPage from '../view/Components/LoginPage/LoginPage';
 import HomePage from '../view/Components/HomePage/HomePage';
+import NewBet from '../view/Components/NewBetPage/NewBetPage';
+import Statistic from '../view/Components/StatisticPage/StatisticPage';
 export type RootStackParamList = {
   Auth: undefined;
   Register: undefined;
   Login: undefined;
   HomePage: undefined;
   NewBet: undefined;
+  Statistic: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -38,6 +41,8 @@ export default function AppNavigator() {
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="NewBet" component={NewBet} />
+        <Stack.Screen name="Statistic" component={Statistic} />
       </Stack.Navigator>
     </NavigationContainer>
   );
