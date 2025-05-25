@@ -16,6 +16,10 @@ export const UserBetSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Option", 
   },
+   isCorrect: {
+    type: Boolean,
+    required: true
+  },
   pickedAt: {
     type: Date,
     default: Date.now,
