@@ -16,43 +16,7 @@ const [error, setError] = useState<string | null>(null);
 
 
   const handleNewBet = async () => {
-    if (!email || !password ) {
-      setError("Please fill all fields and make sure passwords match.");
-      return;
-    }
-  
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const response = await fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-       
-        throw new Error(data.message || "Login failed");
-      }
-  
-      
-      console.log("User Logged In:", data);
-      
-    //  navigation.navigate("Homepage");
-  
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    navigation.navigate("NewBet");
   };
 
   const handleViewBets = () => {
