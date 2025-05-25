@@ -40,11 +40,11 @@ export default function SurveyBuilderPage() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Create a Survey</Text>
+      <Text style={styles.title}>Create a Bet</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Survey Description"
+        placeholder="Bet Description"
         value={description}
         onChangeText={setDescription}
         multiline
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 50,
+    
   },
   title: {
     fontSize: 24,
