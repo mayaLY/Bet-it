@@ -1,177 +1,93 @@
-import React, { useState } from 'react';
-import {View,Text,TextInput,TouchableOpacity,StyleSheet,Alert,} from 'react-native';
-import { useTheme } from '../../../context/Theme/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Dimensions, ActivityIndicator, StyleSheet } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
 import { RootStackParamList } from '../../../router/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+const screenWidth = Dimensions.get('window').width;
+
 type Props = NativeStackScreenProps<RootStackParamList, 'Statistic'>;
-export default function StatisticPage({ navigation }: Props) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+export default function StatisticPage({ navigation }: Props)  {
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ correct: 0, incorrect: 0 });
 
-  const [email, setEmail] = useState('');
-const [name, setUsername] = useState('');
-const [password, setPassword] = useState('');
-const [confirmPassword, setConfirmPassword] = useState('');
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState<string | null>(null);
+  //const userId = route?.params?.userId;
 
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/users/statistics/`);
+        const data = await response.json();
 
-  const handleRegister = async () => {
-    if (!email || !name || !password || password !== confirmPassword) {
-      setError("Please fill all fields and make sure passwords match.");
-      return;
-    }
-  
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const response = await fetch("http://localhost:3000/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          name,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-       
-        throw new Error(data.message || "Registration failed");
+        setStats({
+          correct: data.correctAnswers || 0,
+          incorrect: data.incorrectAnswers || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch statistics:", error);
+      } finally {
+        setLoading(false);
       }
-  
-      
-      console.log("User registered:", data);
-      
-      navigation.navigate("Login");
-  
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const handleGoogleSignUp = () => {
-    
-    Alert.alert('Info', 'Google Sign-Up not implemented yet');
-  };
+    fetchStatistics();
+  }, []);
 
-  const themeStyles = isDark ? darkStyles : lightStyles;
+  const chartData = [
+    {
+      name: 'Correct',
+      population: stats.correct,
+      color: 'green',
+      legendFontColor: '#333',
+      legendFontSize: 15,
+    },
+    {
+      name: 'Incorrect',
+      population: stats.incorrect,
+      color: 'red',
+      legendFontColor: '#333',
+      legendFontSize: 15,
+    },
+  ];
 
   return (
-    <View style={[styles.container, themeStyles.container]}>
-      <Text style={[styles.title, themeStyles.text]}>Register</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Your Bets Statistics</Text>
 
-      <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Email"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Username"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={name}
-        onChangeText={setUsername}
-      />
-
-      <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Password"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TextInput
-        style={[styles.input, themeStyles.input]}
-        placeholder="Confirm Password"
-        placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#de5246' }]}
-        onPress={handleGoogleSignUp}
-      >
-        <Text style={styles.buttonText}>Sign up with Google</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <PieChart
+          data={chartData}
+          width={screenWidth}
+          height={250}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+          absolute
+        />
+      )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 24,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-  },
-  button: {
-    backgroundColor: '#26bbff',
-    padding: 12,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
-
-const lightStyles = StyleSheet.create({
-  container: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
   },
-  text: {
-    color: '#000',
-  },
-  input: {
-    borderColor: '#ccc',
-    color: '#000',
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1c1c1c',
-  },
-  text: {
-    color: '#fff',
-  },
-  input: {
-    borderColor: '#555',
-    color: '#fff',
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
