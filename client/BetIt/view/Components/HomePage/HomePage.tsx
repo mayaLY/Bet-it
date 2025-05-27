@@ -25,7 +25,7 @@ const [error, setError] = useState<string | null>(null);
   };
   const handleStatistics = () => {
     
-    Alert.alert('Info', 'Google Sign-Up not implemented yet');
+    navigation.navigate("Statistic");
   };
 
   const themeStyles = isDark ? darkStyles : lightStyles;

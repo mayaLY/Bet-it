@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { createUserBet } from './controller/setUserBet';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users/userRoutes';
+import betsRouter from './routes/bets/betRoutes';
 import  cors from 'cors';
 
 
@@ -26,6 +27,7 @@ app.use(express.json());
 
 //userRoute
 app.use('/users',usersRouter);
+app.use('/bets',betsRouter);
 //userRoute
 
 mongoose.connect(`${dbUrl}/${database}`)
