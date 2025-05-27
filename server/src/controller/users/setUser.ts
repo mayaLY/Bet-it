@@ -51,11 +51,11 @@ export async function login(req: any, res: any) {
 export async function register(req: any, res: any) {
     try {
       
-        const { email, password, name } = req.body;
-        console.log(email,password,name);
+        const { email, hpassword, name } = req.body;
+        console.log(email,hpassword,name);
 
         //save username and password to database
-        const user = new User({ email, password, name });
+        
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -64,7 +64,8 @@ export async function register(req: any, res: any) {
 
     // Hash the password
     const saltRounds = 10;
-    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    const password = bcrypt.hashSync(hpassword, saltRounds);
+    const user = new User({ email, password, name });
 
 
     await user.save();

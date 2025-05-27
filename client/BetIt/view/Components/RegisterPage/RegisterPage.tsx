@@ -11,14 +11,14 @@ export default function RegisterPage({ navigation }: Props) {
 
   const [email, setEmail] = useState('');
 const [name, setUsername] = useState('');
-const [password, setPassword] = useState('');
+const [hpassword, setPassword] = useState('');
 const [confirmPassword, setConfirmPassword] = useState('');
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 
 
   const handleRegister = async () => {
-    if (!email || !name || !password || password !== confirmPassword) {
+    if (!email || !name || !hpassword || hpassword !== confirmPassword) {
       setError("Please fill all fields and make sure passwords match.");
       return;
     }
@@ -35,7 +35,7 @@ const [error, setError] = useState<string | null>(null);
         body: JSON.stringify({
           email,
           name,
-          password,
+          hpassword,
         }),
       });
   
@@ -91,7 +91,7 @@ const [error, setError] = useState<string | null>(null);
         style={[styles.input, themeStyles.input]}
         placeholder="Password"
         placeholderTextColor={isDark ? '#ccc' : '#888'}
-        value={password}
+        value={hpassword}
         onChangeText={setPassword}
         secureTextEntry
       />
