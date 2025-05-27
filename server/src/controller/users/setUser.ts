@@ -57,21 +57,22 @@ export async function register(req: any, res: any) {
         //save username and password to database
         const user = new User({ email, password, name });
 
-
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).send({ error: 'User already exists' })
-        }
-
-        await user.save()
-        //@ts-ignore
-
-
-        res.status(200).send({ ok: true });
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).send(error);
-
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send({ error: 'User already exists' });
     }
+
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+
+
+    await user.save();
+
+    return res.status(201).send({ ok: true, message: 'User registered successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: 'Internal Server Error' });
+  }
 }
