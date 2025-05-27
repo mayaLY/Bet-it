@@ -1,4 +1,3 @@
-// controllers/statistics/getUserSurveyStats.ts
 import { Request, Response } from 'express';
 import { UserBet } from '../../models/bet/userBetModel';
 
