@@ -35,7 +35,7 @@ export default function SurveyBuilderPage() {
     };
 
     
-   // navigation.navigate('SurveyDisplay', { survey });
+   /// navigation.navigate('SurveyDisplay', { survey });
   };
 
   return (
