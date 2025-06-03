@@ -24,6 +24,7 @@ const NewBetPage = ({ navigation }: any) => {
 
   const createBet = () => {
     // TODO: Submit the survey to the backend
+    
     console.log({
       surveyDescription,
       expirationDate,

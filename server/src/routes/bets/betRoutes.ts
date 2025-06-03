@@ -1,14 +1,16 @@
 import express from "express";
 
-import { getUserSurveyStats } from "../../controller/bets/getUserBetStats";
-
+import { getUserBetStats } from "../../controller/bets/getUserBetStats";
+import { setBet } from "../../controller/bets/setBet";
 
 
 const router = express.Router();
 
 
 
-router.post("/getStats", getUserSurveyStats);
+router.post("/getStats", getUserBetStats);
+router.post("/setBet", setBet);
+
 
 
 export default router;

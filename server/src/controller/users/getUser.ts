@@ -21,7 +21,6 @@ export async function getUser(req: any, res: any) {
 
 export async function getUserBets(req: any, res: any) {
     try {
-      //user id
       const userId = req.userId;
       console.log("getUserPets", userId);
 

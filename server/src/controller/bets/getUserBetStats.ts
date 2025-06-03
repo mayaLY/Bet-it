@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserBet } from '../../models/bet/userBetModel';
 
-export async function getUserSurveyStats(req: any, res: any) {
+export async function getUserBetStats(req: any, res: any) {
   try {
     const userId = req.body;
 
