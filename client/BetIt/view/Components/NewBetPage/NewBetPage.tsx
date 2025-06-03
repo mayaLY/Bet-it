@@ -1,60 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import {View,Text,TextInput, Button,ScrollView,StyleSheet,TouchableOpacity,} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../context/Theme/ThemeContext';
 
-export default function SurveyBuilderPage() {
-  const navigation = useNavigation();
-
-  const [description, setDescription] = useState('');
+const NewBetPage = ({ navigation }: any) => {
+  const [surveyDescription, setBetDescription] = useState('');
   const [expirationDate, setExpirationDate] = useState(new Date());
+  const [options, setOptions] = useState(['', '']);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [options, setOptions] = useState(['', '']); 
 
-  const handleAddOption = () => {
+  const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+  const handleOptionChange = (index: number, value: string) => {
+    const updatedOptions = [...options];
+    updatedOptions[index] = value;
+    setOptions(updatedOptions);
+  };
+
+  const addOption = () => {
     setOptions([...options, '']);
   };
 
-  const handleOptionChange = (text: string, index: number) => {
-    const updated = [...options];
-    updated[index] = text;
-    setOptions(updated);
-  };
-
-  const handleCreateSurvey = () => {
-    const validOptions = options.filter(opt => opt.trim() !== '');
-    if (!description.trim() || validOptions.length < 2) {
-      Alert.alert('Error', 'Please fill out the description and at least 2 valid options.');
-      return;
-    }
-
-    const survey = {
-      description,
+  const createBet = () => {
+    // TODO: Submit the survey to the backend
+    console.log({
+      surveyDescription,
       expirationDate,
-      options: validOptions,
-    };
-
-    
-   /// navigation.navigate('SurveyDisplay', { survey });
+      options,
+    });
+    navigation.navigate('BetPage'); 
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Create a Bet</Text>
-
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: isDark ? '#121212' : '#f9f9f9' }]}>
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Bet Description</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Bet Description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
+        placeholder="Enter Bet description"
+        placeholderTextColor={isDark ? '#aaa' : '#555'}
+        value={surveyDescription}
+        onChangeText={setBetDescription}
+        style={[styles.input, isDark && styles.inputDark]}
       />
 
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
-        <Text style={styles.dateButtonText}>Select Expiration Date</Text>
-        <Text>{expirationDate.toDateString()}</Text>
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Expiration Date</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, isDark && styles.inputDark]}>
+        <Text style={{ color: isDark ? '#fff' : '#000' }}>{expirationDate.toDateString()}</Text>
       </TouchableOpacity>
-
       {showDatePicker && (
         <DateTimePicker
           value={expirationDate}
@@ -62,87 +54,65 @@ export default function SurveyBuilderPage() {
           display="default"
           onChange={(event, selectedDate) => {
             setShowDatePicker(false);
-            if (selectedDate) {
-              setExpirationDate(selectedDate);
-            }
+            if (selectedDate) setExpirationDate(selectedDate);
           }}
         />
       )}
 
-      <Text style={styles.subtitle}>Options:</Text>
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Options</Text>
       {options.map((option, index) => (
         <TextInput
           key={index}
-          style={styles.input}
           placeholder={`Option ${index + 1}`}
+          placeholderTextColor={isDark ? '#aaa' : '#555'}
           value={option}
-          onChangeText={text => handleOptionChange(text, index)}
+          onChangeText={(text) => handleOptionChange(index, text)}
+          style={[styles.input, isDark && styles.inputDark]}
         />
       ))}
 
-      <TouchableOpacity onPress={handleAddOption} style={styles.addButton}>
+      <TouchableOpacity onPress={addOption} style={styles.addButton}>
         <Text style={styles.addButtonText}>+ Add Option</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleCreateSurvey} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>Create Bet</Text>
-      </TouchableOpacity>
+      <Button title="Create Bet" onPress={createBet} />
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingBottom: 50,
-    
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    marginTop: 20,
-    marginBottom: 10,
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#aaa',
-    borderRadius: 10,
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+    color: '#000',
     padding: 10,
-    marginBottom: 10,
+    borderRadius: 8,
+    marginBottom: 12,
   },
-  dateButton: {
-    backgroundColor: '#eee',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  dateButtonText: {
-    fontWeight: 'bold',
+  inputDark: {
+    backgroundColor: '#222',
+    borderColor: '#444',
+    color: '#fff',
   },
   addButton: {
-    backgroundColor: '#26bbff',
+    backgroundColor: '#007BFF',
     padding: 10,
-    borderRadius: 25,
-    alignItems: 'center',
+    borderRadius: 8,
     marginBottom: 20,
+    alignItems: 'center',
   },
   addButtonText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
-  },
-  submitButton: {
-    backgroundColor: '#4caf50',
-    padding: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
+
+export default NewBetPage;
