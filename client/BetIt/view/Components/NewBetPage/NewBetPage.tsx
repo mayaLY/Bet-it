@@ -4,10 +4,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 
 const NewBetPage = ({ navigation }: any) => {
-  const [surveyDescription, setBetDescription] = useState('');
-  const [expirationDate, setExpirationDate] = useState(new Date());
+  const [betDescription, setBetDescription] = useState('');
+  const [expiresAt, setExpirationDate] = useState(new Date());
   const [options, setOptions] = useState(['', '']);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { theme } = useTheme();
     const isDark = theme === 'dark';
@@ -22,15 +24,41 @@ const NewBetPage = ({ navigation }: any) => {
     setOptions([...options, '']);
   };
 
-  const createBet = () => {
-    // TODO: Submit the survey to the backend
-    
-    console.log({
-      surveyDescription,
-      expirationDate,
-      options,
-    });
-    navigation.navigate('BetPage'); 
+  const createBet = async () => {
+    setLoading(true);
+    setError(null);
+
+    console.log({betDescription,expiresAt,options});
+    try {
+      const response = await fetch("http://localhost:3000/bets/setBet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          betDescription,
+          expiresAt,
+          options
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+       
+        throw new Error(data.message || "creating bet failed");
+      }
+  
+      
+      console.log("Bet Created", data);
+      
+  
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+   // navigation.navigate('BetPage'); 
   };
 
   return (
@@ -39,18 +67,18 @@ const NewBetPage = ({ navigation }: any) => {
       <TextInput
         placeholder="Enter Bet description"
         placeholderTextColor={isDark ? '#aaa' : '#555'}
-        value={surveyDescription}
+        value={betDescription}
         onChangeText={setBetDescription}
         style={[styles.input, isDark && styles.inputDark]}
       />
 
       <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Expiration Date</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, isDark && styles.inputDark]}>
-        <Text style={{ color: isDark ? '#fff' : '#000' }}>{expirationDate.toDateString()}</Text>
+        <Text style={{ color: isDark ? '#fff' : '#000' }}>{expiresAt.toDateString()}</Text>
       </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
-          value={expirationDate}
+          value={expiresAt}
           mode="date"
           display="default"
           onChange={(event, selectedDate) => {
