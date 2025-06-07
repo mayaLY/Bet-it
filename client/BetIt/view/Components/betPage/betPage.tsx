@@ -1,39 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 
-// Define the type for the Bet object
-interface Bet {
-  _id: string;
-  betDescription: string;
-  options: string[];
-  expiresAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const betPage = ({ navigation, route }: { navigation: any; route: any }) => {
+const BetPage = ({ navigation, route }: any) => {
   const { betId } = route.params;
-  const [bet, setBet] = useState<Bet | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  const [bet, setBet] = useState<any>(null);
+  const [options, setOptions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBet = async () => {
       try {
-        const res = await fetch('http://localhost:3000/bets/getBetById', {
-           method: 'POST',
-           headers: {
-           'Content-Type': 'application/json',
-         },
-     body: JSON.stringify({ betId }),
-    });
+         const res = await fetch('http://localhost:3000/bets/getBetById', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ betId }),
+        });
+
         const data = await res.json();
-        setBet(data);
+        if (!res.ok) throw new Error(data.message);
+
+        setBet(data.bet);
+        setOptions(data.options);
       } catch (err) {
-        console.error('Failed to fetch bet:', err);
+        console.error('Error fetching bet:', err);
       } finally {
         setLoading(false);
       }
@@ -42,34 +37,19 @@ const betPage = ({ navigation, route }: { navigation: any; route: any }) => {
     fetchBet();
   }, [betId]);
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007BFF" />
-      </View>
-    );
-  }
-
-  if (!bet) {
-    return (
-      <View style={styles.centered}>
-        <Text style={{ color: 'red' }}>Bet not found.</Text>
-      </View>
-    );
-  }
+  if (loading) return <Text>Loading...</Text>;
+  if (!bet) return <Text>Bet not found</Text>;
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: isDark ? '#121212' : '#fff' }]}>
+    <ScrollView style={[styles.container, { backgroundColor: isDark ? '#121212' : '#f9f9f9' }]}>
       <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>{bet.betDescription}</Text>
-      <Text style={[styles.expiration, { color: isDark ? '#aaa' : '#555' }]}>
-        Expires at: {new Date(bet.expiresAt).toLocaleString()}
-      </Text>
+      <Text style={{ color: isDark ? '#aaa' : '#333' }}>Expires: {new Date(bet.expiresAt).toLocaleString()}</Text>
 
-      <Text style={[styles.subTitle, { color: isDark ? '#fff' : '#000' }]}>Options:</Text>
-      {bet.options.map((option, index) => (
-        <View key={index} style={[styles.optionBox, { backgroundColor: isDark ? '#333' : '#f0f0f0' }]}>
-          <Text style={{ color: isDark ? '#fff' : '#000' }}>{option}</Text>
-        </View>
+      <Text style={[styles.optionsTitle, { color: isDark ? '#fff' : '#000' }]}>Options:</Text>
+      {options.map((opt, idx) => (
+        <Text key={idx} style={{ color: isDark ? '#fff' : '#000' }}>
+          • {opt.optionDescription}
+        </Text>
       ))}
     </ScrollView>
   );
@@ -79,30 +59,16 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  expiration: {
-    fontSize: 14,
-    marginBottom: 20,
-  },
-  subTitle: {
+  optionsTitle: {
+    marginTop: 20,
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  optionBox: {
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    fontWeight: '600',
   },
 });
 
-export default betPage;
+export default BetPage;
