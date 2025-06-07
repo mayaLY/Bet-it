@@ -25,41 +25,38 @@ const NewBetPage = ({ navigation }: any) => {
   };
 
   const createBet = async () => {
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
-    console.log({betDescription,expiresAt,options});
-    try {
-      const response = await fetch("http://localhost:3000/bets/setBet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          betDescription,
-          expiresAt,
-          options
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-       
-        throw new Error(data.message || "creating bet failed");
-      }
-  
-      
-      console.log("Bet Created", data);
-      
-  
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+  try {
+    const response = await fetch("http://localhost:3000/bets/setBet", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        betDescription,
+        expiresAt,
+        options,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Creating bet failed");
     }
-   // navigation.navigate('BetPage'); 
-  };
+
+    console.log("Bet Created", data);
+    navigation.navigate("BetPage", { betId: data.bet._id });
+
+  } catch (err: any) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor: isDark ? '#121212' : '#f9f9f9' }]}>
