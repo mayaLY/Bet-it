@@ -8,7 +8,7 @@ import LoginPage from '../view/Components/LoginPage/LoginPage';
 import HomePage from '../view/Components/HomePage/HomePage';
 import NewBet from '../view/Components/NewBetPage/NewBetPage';
 import Statistic from '../view/Components/StatisticPage/StatisticPage';
-import NewBet from '../view/Components/betPage/betPage';
+import betPage from '../view/Components/betPage/betPage';
 export type RootStackParamList = {
   Auth: undefined;
   Register: undefined;

@@ -48,7 +48,7 @@ const NewBetPage = ({ navigation }: any) => {
     }
 
     console.log("Bet Created", data);
-    navigation.navigate("BetPage", { betId: data.bet._id });
+    navigation.navigate("betPage", { betId: data.bet._id });
 
   } catch (err: any) {
     setError(err.message || "Something went wrong");
