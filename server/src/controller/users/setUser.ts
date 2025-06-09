@@ -49,31 +49,31 @@ export async function login(req: any, res: any) {
 }
 
 export async function register(req: any, res: any) {
-    try {
-      
-        const { email, hpassword, name } = req.body;
-        console.log(email,hpassword,name);
-
-        //save username and password to database
-        
+  try {
+    const { email, password, name } = req.body;
+    console.log('Register body:', req.body);
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).send({ error: 'User already exists' });
     }
 
-    // Hash the password
+    // Hash password asynchronously
     const saltRounds = 10;
-    const password = bcrypt.hashSync(hpassword, saltRounds);
-    const user = new User({ email, password, name });
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    const user = new User({
+      email,
+      password: hashedPassword,
+      name,
+    });
 
     await user.save();
 
     return res.status(201).send({ ok: true, message: 'User registered successfully' });
 
   } catch (error) {
-    console.error(error);
+    console.error('Register Error:', error);
     return res.status(500).send({ error: 'Internal Server Error' });
   }
 }
