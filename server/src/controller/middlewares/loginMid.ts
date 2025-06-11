@@ -11,10 +11,10 @@ declare global {
   }
 }
 
-export async function checkUser(req: Request, res: Response, next: NextFunction) {
+export async function checkUser(req: any, res: any, next: NextFunction) {
   try {
     const authHeader = req.headers.authorization;
-
+    console.log(req.headers.authorization);
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Missing or invalid token" });
     }
@@ -31,6 +31,7 @@ export async function checkUser(req: Request, res: Response, next: NextFunction)
     }
 
     req.user = userDB;
+    console.log(req.user);
     next();
   } catch (error) {
     console.error(error);
