@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '../../../context/Theme/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BetPage = ({ navigation, route }: any) => {
   const { betId } = route.params;
@@ -12,30 +13,33 @@ const BetPage = ({ navigation, route }: any) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBet = async () => {
-      try {
-         const res = await fetch('http://localhost:3000/bets/getBetById', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ betId }),
-        });
+  const fetchBet = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token'); 
+      const res = await fetch('http://localhost:3000/bets/getBetById', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // 🛡️ send token
+        },
+        body: JSON.stringify({ betId }),
+      });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
 
-        setBet(data.bet);
-        setOptions(data.options);
-      } catch (err) {
-        console.error('Error fetching bet:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setBet(data.bet);
+      setOptions(data.options);
+      console.log(data)
+    } catch (err) {
+      console.error('Error fetching bet:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchBet();
-  }, [betId]);
+  fetchBet();
+}, [betId]);
 
   if (loading) return <Text>Loading...</Text>;
   if (!bet) return <Text>Bet not found</Text>;

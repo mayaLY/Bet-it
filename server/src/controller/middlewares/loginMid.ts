@@ -1,8 +1,10 @@
+// middlewares/checkUser.ts
+
 import { Request, Response, NextFunction } from "express";
 import { User } from "../../models/user/userModel";
 import jwt from "jsonwebtoken";
 
-// Extend Express Request interface to include 'user'
+// Extend Express Request interface
 declare global {
   namespace Express {
     interface Request {
@@ -11,12 +13,13 @@ declare global {
   }
 }
 
-export async function checkUser(req: any, res: any, next: NextFunction) {
+export const checkUser = async (req: any, res: any, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     console.log(req.headers.authorization);
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Missing or invalid token" });
+      return res.status(401).json({ error: "Missing or invalid token" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -27,14 +30,14 @@ export async function checkUser(req: any, res: any, next: NextFunction) {
     const userDB = await User.findById(decoded.userId);
 
     if (!userDB) {
-      return res.status(401).send({ error: "User not found" });
+      return res.status(401).json({ error: "User not found" });
     }
 
     req.user = userDB;
-    console.log(req.user);
+    console.log(req.user,"user checked");
     next();
   } catch (error) {
-    console.error(error);
-    res.status(401).send({ error: "Invalid token" });
+    console.error("JWT middleware error:", error);
+    return res.status(401).json({ error: "Invalid or expired token" });
   }
-}
+};

@@ -40,7 +40,7 @@ export async function login(req: any, res: any) {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
 
-    return res.status(200).send({ ok: true, user: payload });
+   return res.status(200).send({ ok: true, user: payload, token });
 
   } catch (error) {
     console.error(error);
