@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {View,Text,TextInput, Button,ScrollView,StyleSheet,TouchableOpacity,} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../../../context/Theme/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewBetPage = ({ navigation }: any) => {
   const [betDescription, setBetDescription] = useState('');
@@ -29,10 +30,12 @@ const NewBetPage = ({ navigation }: any) => {
   setError(null);
 
   try {
+     const token = await AsyncStorage.getItem('token'); 
     const response = await fetch("http://localhost:3000/bets/setBet", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+         Authorization: `Bearer ${token}`, 
       },
       body: JSON.stringify({
         betDescription,

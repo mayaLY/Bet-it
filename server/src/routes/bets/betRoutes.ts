@@ -10,8 +10,8 @@ const router = express.Router();
 
 
 
-router.post("/getStats", getUserBetStats);
-router.post("/setBet", setBet);
+router.post("/getStats",checkUser, getUserBetStats);
+router.post("/setBet",checkUser, setBet);
 router.post("/getBetById", checkUser, getBetById);
 
 

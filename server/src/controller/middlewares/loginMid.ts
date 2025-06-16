@@ -17,7 +17,7 @@ export const checkUser = async (req: any, res: any, next: NextFunction) => {
   try {
    
     const authHeader = req.headers.authorization;
-    
+    console.log("got to middleware ",authHeader);
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "Missing or invalid token" });

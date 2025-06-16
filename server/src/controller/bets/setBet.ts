@@ -3,9 +3,12 @@ import { Option } from '../../models/bet/optionModel';
 
 export async function setBet(req:any, res:any) {
   try {
+    console.log("got hereee!!!");
     const { betDescription, expiresAt, options } = req.body;
-
-    const bet = new Bet({ betDescription, expiresAt });
+    const createdBy=req.user?._id;
+    console.log(createdBy,"user id");
+    const bet = new Bet({ createdBy,betDescription, expiresAt });
+    console.log(bet,"this is the beeeet");
     await bet.save();
 
     const createdOptions = await Promise.all(
