@@ -50,7 +50,7 @@ export async function login(req: any, res: any) {
 
 export async function register(req: any, res: any) {
   try {
-    const { email, password, name } = req.body;
+    const { email, hpassword, name } = req.body;
     console.log('Register body:', req.body);
 
     const existingUser = await User.findOne({ email });
@@ -60,7 +60,7 @@ export async function register(req: any, res: any) {
 
     // Hash password asynchronously
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(hpassword, saltRounds);
 
     const user = new User({
       email,
