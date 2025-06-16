@@ -9,21 +9,28 @@ export async function getBets(req: any, res: any) {
       res.status(500).send({error});
     }
   }
-export async function getBetById(req:any, res:any) {
-   const { betId } = req.body;
-
-  if (!betId) return res.status(400).json({ message: "betId is required" });
+export async function getBetById(req: any, res: any) {
+  const userId = req.user?._id;
+  console.log(userId,"got hereee");
+  
+  if (!userId) {
+    return res.status(400).json({ error: "Missing userId" });
+  }
 
   try {
-    const bet = await Bet.findById(betId).populate('createdBy', 'fullname');
-    if (!bet) return res.status(404).json({ message: "Bet not found" });
+    const latestBet = await Bet.findOne({ _id: userId });
+      
+      console.log(latestBet,"bettt");
 
-    const options = await Option.find({ Bet: betId });
+    if (!latestBet) {
+      return res.status(404).json({ message: "No bets found for this user" });
+    }
 
-    res.status(200).json({ bet, options });
+    const options = await Option.find({ Bet: latestBet._id });
+
+    return res.status(200).json({ bet: latestBet, options });
   } catch (err) {
-    console.error("Error fetching bet:", err);
-    res.status(500).json({ message: "Server error", error: err });
+    console.error("Error fetching latest bet:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 }
-  

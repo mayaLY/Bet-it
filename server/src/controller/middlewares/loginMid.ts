@@ -15,8 +15,9 @@ declare global {
 
 export const checkUser = async (req: any, res: any, next: NextFunction) => {
   try {
+   
     const authHeader = req.headers.authorization;
-    console.log(req.headers.authorization);
+    
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "Missing or invalid token" });
@@ -26,7 +27,7 @@ export const checkUser = async (req: any, res: any, next: NextFunction) => {
     const secret = process.env.JWT_SECRET as string;
 
     const decoded = jwt.verify(token, secret) as { userId: string };
-
+   
     const userDB = await User.findById(decoded.userId);
 
     if (!userDB) {
@@ -34,7 +35,7 @@ export const checkUser = async (req: any, res: any, next: NextFunction) => {
     }
 
     req.user = userDB;
-    console.log(req.user,"user checked");
+    
     next();
   } catch (error) {
     console.error("JWT middleware error:", error);

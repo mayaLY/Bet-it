@@ -20,9 +20,8 @@ const BetPage = ({ navigation, route }: any) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // 🛡️ send token
+          Authorization: `Bearer ${token}`, 
         },
-        body: JSON.stringify({ betId }),
       });
 
       const data = await res.json();
