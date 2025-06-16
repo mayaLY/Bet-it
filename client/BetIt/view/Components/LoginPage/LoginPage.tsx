@@ -54,10 +54,7 @@ navigation.navigate("HomePage");
     
     Alert.alert('Info', 'Google Sign-Up not implemented yet!');
   };
-  const handleHome = () => {
-    
-    navigation.navigate("HomePage");
-  };
+  
 
   const themeStyles = isDark ? darkStyles : lightStyles;
 
@@ -89,9 +86,7 @@ navigation.navigate("HomePage");
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleHome}>
-        <Text style={styles.buttonText}>Go To HomePage (for tests only)</Text>
-      </TouchableOpacity>
+      
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#de5246' }]}
         onPress={handleGoogleLogin}
