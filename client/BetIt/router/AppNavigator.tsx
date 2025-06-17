@@ -17,7 +17,7 @@ export type RootStackParamList = {
   HomePage: undefined;
   NewBet: undefined;
   Statistic: undefined;
-  betPage:undefined;
+  betPage: { betId: string };
   viewBetsPage:undefined;
 };
 
