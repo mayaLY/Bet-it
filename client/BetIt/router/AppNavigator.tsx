@@ -9,6 +9,7 @@ import HomePage from '../view/Components/HomePage/HomePage';
 import NewBet from '../view/Components/NewBetPage/NewBetPage';
 import Statistic from '../view/Components/StatisticPage/StatisticPage';
 import betPage from '../view/Components/betPage/betPage';
+import viewBetsPage from '../view/Components/viewBetsPage/viewBetsPage';
 export type RootStackParamList = {
   Auth: undefined;
   Register: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   NewBet: undefined;
   Statistic: undefined;
   betPage:undefined;
+  viewBetsPage:undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export default function AppNavigator() {
         <Stack.Screen name="NewBet" component={NewBet} />
         <Stack.Screen name="Statistic" component={Statistic} />
         <Stack.Screen name="betPage" component={betPage} />
+        <Stack.Screen name="viewBetsPage" component={viewBetsPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -11,16 +11,15 @@ export async function getBets(req: any, res: any) {
   }
 export async function getBetById(req: any, res: any) {
   const userId = req.user?._id;
-  console.log(userId,"got hereee");
   
   if (!userId) {
     return res.status(400).json({ error: "Missing userId" });
   }
 
   try {
-    const latestBet = await Bet.findOne({ _id: userId });
-      
-      console.log(latestBet,"bettt");
+     const latestBet = await Bet.findOne({ createdBy: userId })
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "fullname email");
 
     if (!latestBet) {
       return res.status(404).json({ message: "No bets found for this user" });
