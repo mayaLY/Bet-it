@@ -21,7 +21,7 @@ const [error, setError] = useState<string | null>(null);
 
   const handleViewBets = () => {
     
-    Alert.alert('Info', 'Google Sign-Up not implemented yet');
+    navigation.navigate("viewBetsPage");
   };
   const handleStatistics = () => {
     
