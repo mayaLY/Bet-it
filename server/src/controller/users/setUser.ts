@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 
 export async function login(req: any, res: any) {
   try {
+    console.log("im here");
     const secret = process.env.JWT_SECRET as string;
     const { email, password } = req.body;
 

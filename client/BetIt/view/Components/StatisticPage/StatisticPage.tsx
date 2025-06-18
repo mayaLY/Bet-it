@@ -16,7 +16,7 @@ export default function StatisticPage({ navigation }: Props)  {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/bets/getStats`);
+        const response = await fetch(`http://192.168.7.11:3000/bets/getStats`);
         const data = await response.json();
 
         setStats({

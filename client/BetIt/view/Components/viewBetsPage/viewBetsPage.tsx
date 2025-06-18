@@ -18,7 +18,7 @@ const ViewBetsPage = () => {
       try {
         const token = await AsyncStorage.getItem('token');
 
-        const res = await fetch('http://localhost:3000/bets/getBets', {
+        const res = await fetch('http://192.168.7.11:3000/bets/getBets', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

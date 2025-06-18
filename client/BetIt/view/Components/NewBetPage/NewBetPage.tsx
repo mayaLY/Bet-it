@@ -31,7 +31,7 @@ const NewBetPage = ({ navigation }: any) => {
 
   try {
      const token = await AsyncStorage.getItem('token'); 
-    const response = await fetch("http://localhost:3000/bets/setBet", {
+    const response = await fetch("http://192.168.7.11:3000/bets/setBet", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

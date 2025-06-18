@@ -61,3 +61,28 @@ export const pickOption = async (req:any, res:any) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+
+export const hasPicked = async (req:any, res:any) => {
+  try {
+    const userId = req.user._id;
+    const { betId } = req.params;
+
+    const existing = await UserBet.findOne({ user: userId, bet: betId })
+      .populate('option')
+      .lean();
+
+    if (!existing) {
+      return res.json({ picked: false });
+    }
+
+    return res.json({
+      picked: true,
+      optionDescription: (existing.option as any)?.optionDescription || null,
+    });
+  } catch (err) {
+    console.error('hasPicked error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+

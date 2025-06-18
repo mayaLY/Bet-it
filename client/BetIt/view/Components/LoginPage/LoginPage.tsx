@@ -18,6 +18,7 @@ const [error, setError] = useState<string | null>(null);
 
 
   const handleLogin = async () => {
+     console.log("Login button pressed");
   if (!email || !password) {
     setError("Please fill all fields.");
     return;
@@ -27,7 +28,7 @@ const [error, setError] = useState<string | null>(null);
   setError(null);
 
   try {
-    const response = await fetch("http://localhost:3000/users/login", {
+    const response = await fetch("http://192.168.7.11:3000/users/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

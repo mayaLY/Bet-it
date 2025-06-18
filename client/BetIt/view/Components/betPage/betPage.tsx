@@ -13,12 +13,14 @@ const BetPage = ({ route }: any) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isExpired, setIsExpired] = useState(false);
+  const [hasPicked, setHasPicked] = useState(false);
+  const [userPick, setUserPick] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBet = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        const res = await fetch('http://localhost:3000/bets/getBetById', {
+        const res = await fetch('http://192.168.7.11:3000/bets/getBetById', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -46,10 +48,36 @@ const BetPage = ({ route }: any) => {
     fetchBet();
   }, [betId]);
 
+   useEffect(() => {
+    const fetchUserPick = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const res = await fetch(`http://192.168.7.11:3000/bets/hasPicked`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ betId }),
+          }
+        );
+        const data = await res.json();
+        if (data.picked) {
+          setHasPicked(true);
+          setUserPick(data.optionDescription);
+        }
+      } catch (err) {
+        console.error('Error checking user pick:', err);
+      }
+    };
+
+    if (betId) fetchUserPick();
+  }, [betId]);
+
   const handleSubmitPick = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/bets/pickOption', {
+      const res = await fetch(`http://192.168.7.11:3000/bets/pickOption`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,12 +87,15 @@ const BetPage = ({ route }: any) => {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Submission failed");
-
-      Alert.alert("Success", "Your option has been submitted.");
+      if (res.ok) {
+        setHasPicked(true);
+        const picked = options.find((o) => o._id === selectedOption);
+        setUserPick(picked?.optionDescription || null);
+      } else {
+        console.warn('Pick failed:', data);
+      }
     } catch (err) {
-      Alert.alert("Error");
-     
+      console.error('Error submitting pick:', err);
     }
   };
 
@@ -72,7 +103,12 @@ const BetPage = ({ route }: any) => {
   if (!bet) return <Text>Bet not found</Text>;
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: isDark ? '#121212' : '#f9f9f9' }]}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? '#121212' : '#f9f9f9' },
+      ]}
+    >
       <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
         {bet.betDescription}
       </Text>
@@ -80,39 +116,44 @@ const BetPage = ({ route }: any) => {
         Expires: {new Date(bet.expiresAt).toLocaleString()}
       </Text>
 
-      <Text style={[styles.optionsTitle, { color: isDark ? '#fff' : '#000' }]}>Options:</Text>
-      {options.map((opt: any) => (
-        <TouchableOpacity
-          key={opt._id}
-          onPress={() => !selectedOption && setSelectedOption(opt._id)}
-          disabled={!!selectedOption}
-          style={[
-            styles.optionBox,
-            {
-              borderColor: selectedOption === opt._id ? '#4dd0e1' : '#ccc',
-              backgroundColor:
-                selectedOption === opt._id
-                  ? '#b2ebf2'
-                  : isDark
-                  ? '#222'
-                  : '#eee',
-              opacity: !!selectedOption && selectedOption !== opt._id ? 0.5 : 1,
-            },
-          ]}
-        >
-          <Text style={{ color: isDark ? '#fff' : '#000' }}>{opt.optionDescription}</Text>
-        </TouchableOpacity>
-      ))}
+      <Text style={[styles.optionsTitle, { color: isDark ? '#fff' : '#000' }]}>
+        Options:
+      </Text>
 
-      {!selectedOption && !isExpired && (
-        <View style={{ marginTop: 20 }}>
-          <Button title="Submit Pick" onPress={handleSubmitPick} disabled={!selectedOption} />
-        </View>
-      )}
-
-      {selectedOption && (
-        <Text style={{ color: 'green', marginTop: 20 }}>
-          You picked: {options.find((o) => o._id === selectedOption)?.optionDescription}
+      {!hasPicked ? (
+        <>
+          {options.map((opt, idx) => (
+            <TouchableOpacity
+              key={idx}
+              onPress={() => setSelectedOption(opt._id)}
+              style={[
+                styles.optionItem,
+                {
+                  backgroundColor:
+                    selectedOption === opt._id
+                      ? '#4caf50'
+                      : isDark
+                      ? '#333'
+                      : '#ddd',
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  color: selectedOption === opt._id ? '#fff' : '#000',
+                }}
+              >
+                {opt.optionDescription}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          {selectedOption && (
+            <Button title="Submit Pick" onPress={handleSubmitPick} />
+          )}
+        </>
+      ) : (
+        <Text style={{ color: 'green', marginTop: 10 }}>
+          You picked: {userPick}
         </Text>
       )}
     </ScrollView>
@@ -133,11 +174,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  optionBox: {
-    padding: 12,
-    marginVertical: 6,
-    borderWidth: 1,
-    borderRadius: 10,
+  optionItem: {
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 5,
   },
 });
 
