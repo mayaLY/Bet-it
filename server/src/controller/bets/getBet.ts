@@ -10,34 +10,37 @@ export async function getBets(req: any, res: any) {
       res.status(500).send({error});
     }
   }
+
 export async function getBetById(req: any, res: any) {
   const userId = req.user?._id;
-  
-  if (!userId) {
-    return res.status(400).json({ error: "Missing userId" });
+  const betId = req.body.betId;
+
+  if (!userId || !betId) {
+    return res.status(400).json({ error: "Missing userId or betId" });
   }
 
   try {
-     const latestBet = await Bet.findOne({ createdBy: userId })
-      .sort({ createdAt: -1 })
-      .populate("createdBy", "fullname email");
+    const bet = await Bet.findById(betId).populate("createdBy", "fullname email");
+    if (!bet) return res.status(404).json({ error: "Bet not found" });
 
-    if (!latestBet) {
-      return res.status(404).json({ message: "No bets found for this user" });
-    }
+    const options = await Option.find({ Bet: betId });
 
-    const options = await Option.find({ Bet: latestBet._id });
+    // Check if user already picked
+    const userPick = await UserBet.findOne({ user: userId, bet: betId });
 
-    return res.status(200).json({ bet: latestBet, options });
+    return res.status(200).json({ bet, options, userPick });
   } catch (err) {
-    console.error("Error fetching latest bet:", err);
+    console.error("Error fetching bet:", err);
     return res.status(500).json({ error: "Server error" });
   }
 }
 
+
 export const pickOption = async (req:any, res:any) => {
+  console.log("got here");
   const userId = req.user?._id;
   const { betId, optionId } = req.body;
+  console.log(optionId,"got hereeee");
 
   if (!userId || !betId || !optionId) {
     return res.status(400).json({ error: "Missing required fields" });
