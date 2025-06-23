@@ -118,7 +118,7 @@ const BetPage = ({ route }: any) => {
       const data = await res.json();
       if (res.ok) {
         Alert.alert('Success', 'Correct option set successfully');
-        fetchBet(); // refresh
+        fetchBet(); 
       } else {
         console.warn('Failed to set correct option:', data);
       }

@@ -97,10 +97,8 @@ export const hasPicked = async (req:any, res:any) => {
 
 export const setCorrectOption = async (req: any, res: any) => {
   try {
-    console.log("im in backend");
     const userId = req.user._id;
     const { betId, optionId } = req.body;
-    console.log('Correct optionId received:', optionId);
 
     const bet = await Bet.findById(betId);
 

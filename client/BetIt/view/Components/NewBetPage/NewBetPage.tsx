@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {View,Text,TextInput,Button,ScrollView,StyleSheet,TouchableOpacity} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,8 +73,15 @@ const NewBetPage = ({ navigation }: any) => {
         throw new Error(data.message || "Creating bet failed");
       }
 
-      console.log("Bet Created", data);
-      navigation.navigate("betPage", { betId: data.bet._id });
+   
+      navigation.reset({
+  index: 2,
+  routes: [
+    { name: 'HomePage' },
+    { name: 'viewBetsPage' },
+    { name: 'betPage', params: {betId: data.bet._id } },
+  ],
+});
 
     } catch (err: any) {
       setError(err.message || "Something went wrong");

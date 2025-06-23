@@ -15,7 +15,6 @@ declare global {
 
 export const checkUser = async (req: any, res: any, next: NextFunction) => {
   try {
-   console.log("im in middleware");
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -34,7 +33,6 @@ export const checkUser = async (req: any, res: any, next: NextFunction) => {
     }
 
     req.user = userDB;
-    console.log("all fine in middleware");
     next();
   } catch (error) {
     console.error("JWT middleware error:", error);

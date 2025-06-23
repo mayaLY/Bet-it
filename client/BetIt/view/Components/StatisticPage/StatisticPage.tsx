@@ -12,8 +12,6 @@ export default function StatisticPage({ navigation }: Props)  {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ correct: 0, incorrect: 0 });
 
-  //const userId = route?.params?.userId;
-
   useEffect(() => {
     const fetchStatistics = async () => {
        const token = await AsyncStorage.getItem('token');
