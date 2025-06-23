@@ -3,6 +3,7 @@ import { View, Text, Dimensions, ActivityIndicator, StyleSheet } from 'react-nat
 import { PieChart } from 'react-native-chart-kit';
 import { RootStackParamList } from '../../../router/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -15,8 +16,15 @@ export default function StatisticPage({ navigation }: Props)  {
 
   useEffect(() => {
     const fetchStatistics = async () => {
+       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await fetch(`http://192.168.7.11:3000/bets/getStats`);
+        const response = await fetch(`http://192.168.7.16:3000/bets/getStats`,{
+        method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
 
         setStats({

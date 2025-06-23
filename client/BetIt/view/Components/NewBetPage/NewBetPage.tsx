@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import {View,Text,TextInput, Button,ScrollView,StyleSheet,TouchableOpacity,} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewBetPage = ({ navigation }: any) => {
   const [betDescription, setBetDescription] = useState('');
-  const [expiresAt, setExpirationDate] = useState(new Date());
+  const [expiresAt, setExpiresAt] = useState(new Date());
   const [options, setOptions] = useState(['', '']);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { theme } = useTheme();
-    const isDark = theme === 'dark';
+  const isDark = theme === 'dark';
 
   const handleOptionChange = (index: number, value: string) => {
     const updatedOptions = [...options];
@@ -25,45 +34,73 @@ const NewBetPage = ({ navigation }: any) => {
     setOptions([...options, '']);
   };
 
-  const createBet = async () => {
-  setLoading(true);
-  setError(null);
-
-  try {
-     const token = await AsyncStorage.getItem('token'); 
-    const response = await fetch("http://192.168.7.11:3000/bets/setBet", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-         Authorization: `Bearer ${token}`, 
-      },
-      body: JSON.stringify({
-        betDescription,
-        expiresAt,
-        options,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Creating bet failed");
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const updated = new Date(expiresAt);
+      updated.setFullYear(selectedDate.getFullYear());
+      updated.setMonth(selectedDate.getMonth());
+      updated.setDate(selectedDate.getDate());
+      setExpiresAt(updated);
     }
+  };
 
-    console.log("Bet Created", data);
-    navigation.navigate("betPage", { betId: data.bet._id });
+  const onChangeTime = (event: any, selectedTime?: Date) => {
+    setShowTimePicker(false);
+    if (selectedTime) {
+      const updated = new Date(expiresAt);
+      updated.setHours(selectedTime.getHours());
+      updated.setMinutes(selectedTime.getMinutes());
+      updated.setSeconds(0);
+      setExpiresAt(updated);
+    }
+  };
 
-  } catch (err: any) {
-    setError(err.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+  const createBet = async () => {
+    setLoading(true);
+    setError(null);
 
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch("http://192.168.7.16:3000/bets/setBet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          betDescription,
+          expiresAt,
+          options,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Creating bet failed");
+      }
+
+      console.log("Bet Created", data);
+      navigation.navigate("betPage", { betId: data.bet._id });
+
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: isDark ? '#121212' : '#f9f9f9' }]}>
-      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Bet Description</Text>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: isDark ? '#121212' : '#f9f9f9' },
+      ]}
+    >
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+        Bet Description
+      </Text>
       <TextInput
         placeholder="Enter Bet description"
         placeholderTextColor={isDark ? '#aaa' : '#555'}
@@ -72,23 +109,48 @@ const NewBetPage = ({ navigation }: any) => {
         style={[styles.input, isDark && styles.inputDark]}
       />
 
-      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Expiration Date</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, isDark && styles.inputDark]}>
-        <Text style={{ color: isDark ? '#fff' : '#000' }}>{expiresAt.toDateString()}</Text>
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+        Expiration Date & Time
+      </Text>
+
+      <TouchableOpacity
+        onPress={() => setShowDatePicker(true)}
+        style={[styles.input, isDark && styles.inputDark]}
+      >
+        <Text style={{ color: isDark ? '#fff' : '#000' }}>
+          {expiresAt.toDateString()}
+        </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setShowTimePicker(true)}
+        style={[styles.input, isDark && styles.inputDark]}
+      >
+        <Text style={{ color: isDark ? '#fff' : '#000' }}>
+          {expiresAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
+      </TouchableOpacity>
+
       {showDatePicker && (
         <DateTimePicker
           value={expiresAt}
           mode="date"
           display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) setExpirationDate(selectedDate);
-          }}
+          onChange={onChangeDate}
+        />
+      )}
+      {showTimePicker && (
+        <DateTimePicker
+          value={expiresAt}
+          mode="time"
+          display="default"
+          onChange={onChangeTime}
         />
       )}
 
-      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>Options</Text>
+      <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+        Options
+      </Text>
       {options.map((option, index) => (
         <TextInput
           key={index}

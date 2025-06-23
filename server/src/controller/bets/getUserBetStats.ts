@@ -3,7 +3,7 @@ import { UserBet } from '../../models/bet/userBetModel';
 
 export async function getUserBetStats(req: any, res: any) {
   try {
-    const userId = req.body;
+    const userId = req.user?._id;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {View,Text,ScrollView,StyleSheet,TouchableOpacity,Button,Alert,} from 'react-native';
+import {View,Text,ScrollView,StyleSheet,TouchableOpacity,Button,Alert } from 'react-native';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,72 +12,75 @@ const BetPage = ({ route }: any) => {
   const [options, setOptions] = useState<any[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isExpired, setIsExpired] = useState(false);
   const [hasPicked, setHasPicked] = useState(false);
   const [userPick, setUserPick] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const fetchBet = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const res = await fetch('http://192.168.7.16:3000/bets/getBetById', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ betId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      setBet(data.bet);
+      setOptions(data.options);
+      if (data.userPick?.option) {
+        setSelectedOption(data.userPick.option);
+      }
+
+      // Parse user ID from token
+      const payload = JSON.parse(atob(token!.split('.')[1]));
+      setUserId(payload.userId);
+
+    } catch (err) {
+      console.error('Error fetching bet:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPick = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const res = await fetch(`http://192.168.7.16:3000/bets/hasPicked`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ betId }),
+      });
+      const data = await res.json();
+      if (data.picked) {
+        setHasPicked(true);
+        setUserPick(data.optionDescription);
+      }
+    } catch (err) {
+      console.error('Error checking user pick:', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchBet = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const res = await fetch('http://192.168.7.11:3000/bets/getBetById', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ betId }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        setBet(data.bet);
-        setOptions(data.options);
-        if (data.userPick?.option) {
-          setSelectedOption(data.userPick.option);
-        }
-        setIsExpired(new Date(data.bet.expiresAt) < new Date());
-      } catch (err) {
-        console.error('Error fetching bet:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBet();
   }, [betId]);
 
-   useEffect(() => {
-    const fetchUserPick = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const res = await fetch(`http://192.168.7.11:3000/bets/hasPicked`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ betId }),
-          }
-        );
-        const data = await res.json();
-        if (data.picked) {
-          setHasPicked(true);
-          setUserPick(data.optionDescription);
-        }
-      } catch (err) {
-        console.error('Error checking user pick:', err);
-      }
-    };
-
+  useEffect(() => {
     if (betId) fetchUserPick();
   }, [betId]);
 
   const handleSubmitPick = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const res = await fetch(`http://192.168.7.11:3000/bets/pickOption`, {
+      const res = await fetch(`http://192.168.7.16:3000/bets/pickOption`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,8 +102,36 @@ const BetPage = ({ route }: any) => {
     }
   };
 
+  const handleSetCorrect = async (optionId: string) => {
+    try {
+      console.log("handleSetCorrect is clicked");
+      const token = await AsyncStorage.getItem('token');
+      const res = await fetch(`http://192.168.7.16:3000/bets/setCorrectOption`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ betId, optionId }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        Alert.alert('Success', 'Correct option set successfully');
+        fetchBet(); // refresh
+      } else {
+        console.warn('Failed to set correct option:', data);
+      }
+    } catch (err) {
+      console.error('Error setting correct option:', err);
+    }
+  };
+
   if (loading) return <Text>Loading...</Text>;
   if (!bet) return <Text>Bet not found</Text>;
+
+  const isOwner = userId && bet.createdBy?._id === userId;
+  const isExpired = new Date(bet.expiresAt) < new Date();
 
   return (
     <ScrollView
@@ -120,12 +151,14 @@ const BetPage = ({ route }: any) => {
         Options:
       </Text>
 
-      {!hasPicked ? (
-        <>
-          {options.map((opt, idx) => (
+      {options.map((opt, idx) => (
+        <View key={idx} style={styles.optionContainer}>
+          <Text style={{ color: isDark ? '#fff' : '#000' }}>
+            • {opt.optionDescription}
+          </Text>
+
+          {!hasPicked && !isExpired && (
             <TouchableOpacity
-              key={idx}
-              onPress={() => setSelectedOption(opt._id)}
               style={[
                 styles.optionItem,
                 {
@@ -137,21 +170,32 @@ const BetPage = ({ route }: any) => {
                       : '#ddd',
                 },
               ]}
+              onPress={() => setSelectedOption(opt._id)}
             >
               <Text
                 style={{
                   color: selectedOption === opt._id ? '#fff' : '#000',
                 }}
               >
-                {opt.optionDescription}
+                {selectedOption === opt._id ? 'Selected' : 'Pick'}
               </Text>
             </TouchableOpacity>
-          ))}
-          {selectedOption && (
-            <Button title="Submit Pick" onPress={handleSubmitPick} />
           )}
-        </>
-      ) : (
+
+          {isOwner && isExpired && (
+            <Button
+              title="Mark as Correct"
+              onPress={() => handleSetCorrect(opt._id)}
+            />
+          )}
+        </View>
+      ))}
+
+      {!hasPicked && selectedOption && !isExpired && (
+        <Button title="Submit Pick" onPress={handleSubmitPick} />
+      )}
+
+      {hasPicked && (
         <Text style={{ color: 'green', marginTop: 10 }}>
           You picked: {userPick}
         </Text>
@@ -174,10 +218,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  optionContainer: {
+    marginVertical: 10,
+  },
   optionItem: {
     padding: 10,
     borderRadius: 8,
-    marginVertical: 5,
+    marginTop: 5,
+    alignItems: 'center',
   },
 });
 

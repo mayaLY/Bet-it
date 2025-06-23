@@ -1,7 +1,17 @@
 import { Bet } from "../../models/bet/betModel";
 import { Option } from '../../models/bet/optionModel';
 import { UserBet } from "../../models/bet/userBetModel";
+import { Types } from "mongoose";
 
+type BetType = {
+  _id: string;
+  betDescription: string;
+  expiresAt: string;
+  createdBy?: {
+    _id: string;
+    username?: string;
+  } | null;
+};
 export async function getBets(req: any, res: any) {
     try {
       const bets = await Bet.find();
@@ -85,4 +95,57 @@ export const hasPicked = async (req:any, res:any) => {
   }
 };
 
+export const setCorrectOption = async (req: any, res: any) => {
+  try {
+    console.log("im in backend");
+    const userId = req.user._id;
+    const { betId, optionId } = req.body;
+    console.log('Correct optionId received:', optionId);
 
+    const bet = await Bet.findById(betId);
+
+    if (!bet) return res.status(404).json({ error: 'Bet not found' });
+
+    // 👇 Fix safely accessing `createdBy`
+    const createdById = ((): string | null => {
+      if (!bet.createdBy) return null;
+
+      if (typeof bet.createdBy === 'string') return bet.createdBy;
+      if (bet.createdBy instanceof Types.ObjectId) return bet.createdBy.toString();
+      if (typeof bet.createdBy === 'object' && '_id' in bet.createdBy) {
+        return (bet.createdBy as any)._id?.toString() ?? null;
+      }
+
+      return null;
+    })();
+
+    if (!createdById || createdById !== userId.toString()) {
+      return res.status(403).json({ error: 'Only the creator can set the correct option' });
+    }
+
+    // ✅ Safe expiration check
+    const expiresAt = bet.expiresAt ? new Date(bet.expiresAt) : null;
+    if (!expiresAt || expiresAt > new Date()) {
+      return res.status(400).json({ error: 'Bet has not expired yet' });
+    }
+
+    // ✅ Update user picks with correct answer
+   await UserBet.updateMany(
+  { bet: betId },
+  [
+    {
+      $set: {
+        isCorrect: {
+          $eq: ['$option', { $toObjectId: optionId }],
+        },
+      },
+    },
+  ]
+);
+
+    return res.json({ message: 'Correct option set successfully' });
+  } catch (err) {
+    console.error('setCorrectOption error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
