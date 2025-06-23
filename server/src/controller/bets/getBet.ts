@@ -14,7 +14,8 @@ type BetType = {
 };
 export async function getBets(req: any, res: any) {
     try {
-      const bets = await Bet.find();
+      const userId = req.user?._id;
+      const bets = await Bet.find({createdBy:userId});
       res.send({bets});
     } catch (error) {
       res.status(500).send({error});
