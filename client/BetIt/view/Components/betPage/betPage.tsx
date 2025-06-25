@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {View,Text,ScrollView,StyleSheet,TouchableOpacity,Button,Alert } from 'react-native';
 import { useTheme } from '../../../context/Theme/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
+import * as Share from 'expo-sharing'; // optional, native sharing
+import { Share as RNShare } from 'react-native';
 
 const BetPage = ({ route }: any) => {
   const { betId } = route.params;
@@ -126,6 +129,16 @@ const BetPage = ({ route }: any) => {
       console.error('Error setting correct option:', err);
     }
   };
+  const handleShare = async () => {
+  const url = Linking.createURL(`bet/${betId}`);
+  try {
+    await RNShare.share({
+      message: `Join this bet: ${bet.betDescription}\n\nClick to pick: ${url}`,
+    });
+  } catch (error) {
+    console.error('Error sharing:', error);
+  }
+};
 
   if (loading) return <Text>Loading...</Text>;
   if (!bet) return <Text>Bet not found</Text>;
@@ -200,6 +213,7 @@ const BetPage = ({ route }: any) => {
           You picked: {userPick}
         </Text>
       )}
+      <Button title="Share This Bet" onPress={handleShare} />
     </ScrollView>
   );
 };

@@ -1,15 +1,18 @@
 import React from 'react';
-import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Linking from 'expo-linking';
 import { useTheme } from '../context/Theme/ThemeContext';
+
 import AuthPage from '../view/Components/AuthPage/AuthPage';
 import RegisterPage from '../view/Components/RegisterPage/RegisterPage';
 import LoginPage from '../view/Components/LoginPage/LoginPage';
 import HomePage from '../view/Components/HomePage/HomePage';
 import NewBet from '../view/Components/NewBetPage/NewBetPage';
 import Statistic from '../view/Components/StatisticPage/StatisticPage';
-import betPage from '../view/Components/betPage/betPage';
-import viewBetsPage from '../view/Components/viewBetsPage/viewBetsPage';
+import BetPage from '../view/Components/betPage/betPage';
+import ViewBetsPage from '../view/Components/viewBetsPage/viewBetsPage';
+
 export type RootStackParamList = {
   Auth: undefined;
   Register: undefined;
@@ -18,17 +21,27 @@ export type RootStackParamList = {
   NewBet: undefined;
   Statistic: undefined;
   betPage: { betId: string };
-  viewBetsPage:undefined;
+  viewBetsPage: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const linking = {
+  prefixes: ['mybetapp://'],
+  config: {
+    screens: {
+      betPage: 'bet/:betId',
+      // Add other deep linkable screens here if needed
+    },
+  },
+};
 
 export default function AppNavigator() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   return (
-    <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+    <NavigationContainer linking={linking} theme={isDark ? DarkTheme : DefaultTheme}>
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
@@ -47,8 +60,8 @@ export default function AppNavigator() {
         <Stack.Screen name="HomePage" component={HomePage} />
         <Stack.Screen name="NewBet" component={NewBet} />
         <Stack.Screen name="Statistic" component={Statistic} />
-        <Stack.Screen name="betPage" component={betPage} />
-        <Stack.Screen name="viewBetsPage" component={viewBetsPage} />
+        <Stack.Screen name="betPage" component={BetPage} />
+        <Stack.Screen name="viewBetsPage" component={ViewBetsPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
